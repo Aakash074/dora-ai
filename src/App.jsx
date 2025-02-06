@@ -1,4 +1,10 @@
 import { PrivyProvider, usePrivy } from '@privy-io/react-auth'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import DashboardLayout from './components/DashboardLayout'
+import Home from './pages/Home'
+import Buckets from './pages/Buckets'
+import Upload from './pages/Upload'
+import Profile from './pages/Profile'
 import doraImage from './assets/dora.jpeg'
 
 const styles = {
@@ -84,7 +90,6 @@ const styles = {
   },
   heroText: {
     fontSize: '24px',
-    // color: '#4B5563',
     marginBottom: '48px',
     maxWidth: '768px',
     margin: '0 auto 48px'
@@ -113,14 +118,16 @@ const styles = {
     transition: 'all 0.3s ease'
   },
   featureIcon: {
-    width: '56px',
-    height: '56px',
+    width: '50px',
+    height: '50px',
     background: 'linear-gradient(135deg, #7C3AED, #4F46E5)',
     borderRadius: '12px',
+    padding: '10px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: '24px',
+    color: 'white',
     boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
   },
   featureTitle: {
@@ -164,9 +171,13 @@ const styles = {
   }
 }
 
-// Create a new component for the main content
-function MainContent() {
-  const { login, logout, authenticated, user } = usePrivy()
+// Landing page component
+function Landing() {
+  const { login, authenticated } = usePrivy()
+
+  if (authenticated) {
+    return <Navigate to="/dashboard" replace />
+  }
 
   return (
     <div style={styles.container}>
@@ -179,20 +190,9 @@ function MainContent() {
               <h1 style={styles.logoText}>Dora AI</h1>
             </div>
             <div>
-              {!authenticated ? (
-                <button onClick={login} style={styles.button}>
-                  Get Started
-                </button>
-              ) : (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                  <span style={{ display: 'none', '@media (min-width: 640px)': { display: 'block' } }}>
-                    Welcome, {user?.email || 'Traveler'}!
-                  </span>
-                  <button onClick={logout} style={styles.button}>
-                    Logout
-                  </button>
-                </div>
-              )}
+              <button onClick={login} style={styles.button}>
+                Get Started
+              </button>
             </div>
           </div>
         </div>
@@ -206,14 +206,12 @@ function MainContent() {
             <div style={styles.heroText}>
               Travel smarter, earn rewards, and turn your social media inspiration into reality with our AI-powered travel planning.
             </div>
-            {!authenticated && (
-              <button 
-                onClick={login}
-                style={styles.button}
-              >
-                Start Your Journey
-              </button>
-            )}
+            <button 
+              onClick={login}
+              style={styles.button}
+            >
+              Start Your Journey
+            </button>
           </div>
         </div>
 
@@ -261,15 +259,13 @@ function MainContent() {
         <div style={styles.cta}>
           <div style={styles.ctaInner}>
             <h2 style={styles.heroTitle}>Ready to Start Your Adventure?</h2>
-            <p style={styles.heroText} className='text-white'>Join thousands of travelers who are exploring the world with Dora AI.</p>
-            {!authenticated && (
-              <button 
-                onClick={login}
-                style={styles.button}
-              >
-                Join Now
-              </button>
-            )}
+            <p style={styles.heroText}>Join thousands of travelers who are exploring the world with Dora AI.</p>
+            <button 
+              onClick={login}
+              style={styles.button}
+            >
+              Join Now
+            </button>
           </div>
         </div>
       </main>
@@ -319,10 +315,51 @@ function MainContent() {
   )
 }
 
-function App() {
+// Protected route wrapper
+function ProtectedRoute({ children }) {
+  const { authenticated, ready } = usePrivy()
+
+  if (!ready) {
+    return null // or a loading spinner
+  }
+
+  if (!authenticated) {
+    return <Navigate to="/" replace />
+  }
+
+  return children
+}
+
+// Main content with routing
+function MainContent() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <Routes>
+                  <Route index element={<Home />} />
+                  <Route path="buckets" element={<Buckets />} />
+                  <Route path="upload" element={<Upload />} />
+                  <Route path="profile" element={<Profile />} />
+                </Routes>
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </BrowserRouter>
+  )
+}
+
+export default function App() {
   return (
     <PrivyProvider
-      appId='cm6riqwzp029bao5thygiawxs'
+      appId="cm6riqwzp029bao5thygiawxs"
       config={{
         loginMethods: ['email', 'google', 'apple', 'twitter', 'tiktok'],
         appearance: {
@@ -336,5 +373,3 @@ function App() {
     </PrivyProvider>
   )
 }
-
-export default App
