@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { usePrivy } from '@privy-io/react-auth'
+import PropTypes from 'prop-types'
 import {
   HomeIcon,
   FolderIcon,
@@ -29,10 +30,10 @@ const styles = {
     left: 0,
     width: '256px',
     display: 'none',
-    flexDirection: 'column',
-    '@media (min-width: 1024px)': {
-      display: 'flex'
-    }
+    flexDirection: 'column'
+  },
+  desktopSidebarVisible: {
+    display: 'flex'
   },
   sidebarContent: {
     display: 'flex',
@@ -114,6 +115,12 @@ const styles = {
     width: '100%',
     transition: 'all 0.2s'
   },
+  mobileContainer: {
+    display: 'block'
+  },
+  mobileContainerHidden: {
+    display: 'none'
+  },
   mobileNav: {
     position: 'fixed',
     bottom: 0,
@@ -126,10 +133,7 @@ const styles = {
     display: 'flex',
     height: '64px',
     alignItems: 'center',
-    justifyContent: 'space-around',
-    '@media (min-width: 1024px)': {
-      display: 'none'
-    }
+    justifyContent: 'space-around'
   },
   mobileNavItem: {
     display: 'inline-flex',
@@ -152,10 +156,7 @@ const styles = {
     borderBottom: '1px solid rgba(229, 231, 235, 1)',
     background: 'rgba(255, 255, 255, 0.5)',
     backdropFilter: 'blur(8px)',
-    padding: '0 16px',
-    '@media (min-width: 1024px)': {
-      display: 'none'
-    }
+    padding: '0 16px'
   },
   mobileLogoutButton: {
     padding: '8px',
@@ -166,32 +167,39 @@ const styles = {
     cursor: 'pointer'
   },
   mainContent: {
-    paddingLeft: 0,
-    '@media (min-width: 1024px)': {
-      paddingLeft: '256px'
-    }
+    paddingLeft: 0
   },
   mainInner: {
-    padding: '40px 16px 80px',
-    minHeight: '100vh',
-    '@media (min-width: 640px)': {
-      padding: '40px 24px'
-    },
-    '@media (min-width: 1024px)': {
-      padding: '24px 32px',
-      paddingBottom: '24px'
-    }
+    padding: '24px 16px 80px',
+    minHeight: '100vh'
   }
+}
+
+DashboardLayout.propTypes = {
+  children: PropTypes.node.isRequired
 }
 
 export default function DashboardLayout({ children }) {
   const { logout } = usePrivy()
   const location = useLocation()
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024)
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 1024)
+    }
+
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   return (
     <div style={styles.container}>
       {/* Desktop sidebar */}
-      <div style={styles.desktopSidebar}>
+      <div style={{
+        ...styles.desktopSidebar,
+        ...(isMobile ? {} : styles.desktopSidebarVisible)
+      }}>
         <div style={styles.sidebarContent}>
           <div style={styles.logoContainer}>
             <img src={doraImage} alt="Dora AI Logo" style={styles.logo} />
@@ -234,47 +242,52 @@ export default function DashboardLayout({ children }) {
         </div>
       </div>
 
-      {/* Mobile bottom navigation */}
-      <div style={styles.mobileNav}>
-        {navigation.map((item) => (
-          <Link
-            key={item.name}
-            to={item.href}
-            style={{
-              ...styles.mobileNavItem,
-              color: location.pathname === item.href ? '#4F46E5' : '#6B7280'
-            }}
-          >
-            <item.icon
-              style={{
-                width: '24px',
-                height: '24px',
-                color: location.pathname === item.href ? '#4F46E5' : '#9CA3AF'
-              }}
-              aria-hidden="true"
-            />
-            <span style={styles.mobileNavText}>{item.name}</span>
-          </Link>
-        ))}
-      </div>
-
-      {/* Mobile top bar with logout */}
-      <div style={styles.mobileHeader}>
-        <div style={styles.logoContainer}>
-          <img src={doraImage} alt="Dora AI Logo" style={styles.logo} />
-          <span style={styles.logoText}>Dora AI</span>
+      {/* Mobile header and navigation */}
+      <div style={{
+        ...styles.mobileContainer,
+        ...(isMobile ? {} : styles.mobileContainerHidden)
+      }}>
+        <div style={styles.mobileHeader}>
+          <div style={styles.logoContainer}>
+            <img src={doraImage} alt="Dora AI Logo" style={styles.logo} />
+            <span style={styles.logoText}>Dora AI</span>
+          </div>
+          <button onClick={logout} style={styles.mobileLogoutButton}>
+            <ArrowLeftOnRectangleIcon style={{ width: '24px', height: '24px' }} aria-hidden="true" />
+          </button>
         </div>
-        <button onClick={logout} style={styles.mobileLogoutButton}>
-          <ArrowLeftOnRectangleIcon style={{ width: '24px', height: '24px' }} aria-hidden="true" />
-        </button>
+
+        <div style={styles.mobileNav}>
+          {navigation.map((item) => (
+            <Link
+              key={item.name}
+              to={item.href}
+              style={{
+                ...styles.mobileNavItem,
+                color: location.pathname === item.href ? '#4F46E5' : '#6B7280'
+              }}
+            >
+              <item.icon
+                style={{
+                  width: '24px',
+                  height: '24px',
+                  color: location.pathname === item.href ? '#4F46E5' : '#9CA3AF'
+                }}
+                aria-hidden="true"
+              />
+              <span style={styles.mobileNavText}>{item.name}</span>
+            </Link>
+          ))}
+        </div>
       </div>
 
       {/* Main content */}
-      <main style={styles.mainContent}>
-        <div style={styles.mainInner}>
-          {children}
-        </div>
-      </main>
+      <div style={{ 
+        ...styles.mainInner,
+        ...(isMobile ? {} : { paddingLeft: '280px' })
+      }}>
+        {children}
+      </div>
     </div>
   )
 } 

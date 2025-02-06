@@ -6,6 +6,7 @@ import Buckets from './pages/Buckets'
 import Upload from './pages/Upload'
 import Profile from './pages/Profile'
 import doraImage from './assets/dora.jpeg'
+import PropTypes from 'prop-types'
 
 const styles = {
   container: {
@@ -330,27 +331,28 @@ function ProtectedRoute({ children }) {
   return children
 }
 
+ProtectedRoute.propTypes = {
+  children: PropTypes.node.isRequired
+}
+
 // Main content with routing
 function MainContent() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Landing />} />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <DashboardLayout>
-                <Routes>
-                  <Route index element={<Home />} />
-                  <Route path="buckets" element={<Buckets />} />
-                  <Route path="upload" element={<Upload />} />
-                  <Route path="profile" element={<Profile />} />
-                </Routes>
-              </DashboardLayout>
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/dashboard/*" element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="buckets" element={<Buckets />} />
+                <Route path="upload" element={<Upload />} />
+                <Route path="profile" element={<Profile />} />
+              </Routes>
+            </DashboardLayout>
+          </ProtectedRoute>
+        } />
       </Routes>
     </BrowserRouter>
   )
@@ -361,7 +363,7 @@ export default function App() {
     <PrivyProvider
       appId="cm6riqwzp029bao5thygiawxs"
       config={{
-        loginMethods: ['email', 'google', 'apple', 'twitter', 'tiktok'],
+        loginMethods: ['email', 'wallet', 'google', 'apple', 'twitter', 'tiktok'],
         appearance: {
           theme: 'light',
           accentColor: '#6366F1', // Indigo-500
