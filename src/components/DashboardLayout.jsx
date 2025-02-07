@@ -28,9 +28,13 @@ const styles = {
     top: 0,
     bottom: 0,
     left: 0,
-    width: '256px',
+    width: '280px',
     display: 'none',
-    flexDirection: 'column'
+    flexDirection: 'column',
+    background: 'rgba(255, 255, 255, 0.9)',
+    backdropFilter: 'blur(12px)',
+    borderRight: '1px solid rgba(229, 231, 235, 0.5)',
+    boxShadow: '4px 0 12px rgba(0, 0, 0, 0.03)'
   },
   desktopSidebarVisible: {
     display: 'flex'
@@ -39,31 +43,47 @@ const styles = {
     display: 'flex',
     flexGrow: 1,
     flexDirection: 'column',
-    gap: '20px',
+    gap: '32px',
     overflowY: 'auto',
-    borderRight: '1px solid rgba(229, 231, 235, 1)',
-    background: 'rgba(255, 255, 255, 0.5)',
-    backdropFilter: 'blur(8px)',
-    padding: '0 24px 16px 24px'
+    padding: '24px',
+    scrollbarWidth: 'thin',
+    scrollbarColor: '#E5E7EB transparent',
+    '&::-webkit-scrollbar': {
+      width: '4px'
+    },
+    '&::-webkit-scrollbar-track': {
+      background: 'transparent'
+    },
+    '&::-webkit-scrollbar-thumb': {
+      background: '#E5E7EB',
+      borderRadius: '4px'
+    }
   },
   logoContainer: {
     display: 'flex',
-    height: '64px',
     alignItems: 'center',
-    flexShrink: 0
+    padding: '12px 0',
+    marginBottom: '8px'
   },
   logo: {
-    height: '32px',
-    width: '32px',
-    borderRadius: '50%'
+    height: '40px',
+    width: '40px',
+    borderRadius: '12px',
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)'
   },
   logoText: {
-    marginLeft: '8px',
-    fontSize: '20px',
+    fontSize: '24px',
     fontWeight: 'bold',
     background: 'linear-gradient(to right, #7C3AED, #4F46E5)',
     WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent'
+    WebkitTextFillColor: 'transparent',
+    marginLeft: '12px',
+    // fontSize: '24px',
+    // fontWeight: 'bold',
+    // background: 'linear-gradient(135deg, #7C3AED, #4F46E5)',
+    // WebkitBackgroundClip: 'text',
+    // WebkitTextFillColor: 'transparent',
+    // letterSpacing: '-0.5px'
   },
   nav: {
     display: 'flex',
@@ -73,29 +93,33 @@ const styles = {
   navList: {
     display: 'flex',
     flexDirection: 'column',
-    flexGrow: 1,
-    gap: '28px'
+    gap: '8px'
   },
   navItem: {
     display: 'flex',
     alignItems: 'center',
     gap: '12px',
-    padding: '8px',
-    borderRadius: '6px',
-    fontSize: '14px',
-    fontWeight: '600',
-    color: '#374151',
+    padding: '12px 16px',
+    borderRadius: '12px',
+    fontSize: '15px',
+    fontWeight: '500',
+    color: '#4B5563',
     textDecoration: 'none',
-    transition: 'all 0.2s'
+    transition: 'all 0.2s ease',
+    '&:hover': {
+      backgroundColor: '#F3F4F6'
+    }
   },
   navItemActive: {
-    backgroundColor: '#F9FAFB',
-    color: '#4F46E5'
+    backgroundColor: '#EEF2FF',
+    color: '#4F46E5',
+    fontWeight: '600'
   },
   navIcon: {
-    width: '24px',
-    height: '24px',
-    color: '#9CA3AF'
+    width: '20px',
+    height: '20px',
+    color: '#6B7280',
+    transition: 'color 0.2s ease'
   },
   navIconActive: {
     color: '#4F46E5'
@@ -104,16 +128,63 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     gap: '12px',
-    padding: '8px',
-    borderRadius: '6px',
-    fontSize: '14px',
-    fontWeight: '600',
-    color: '#374151',
+    marginTop: 'auto',
+    padding: '12px 16px',
+    borderRadius: '12px',
+    fontSize: '15px',
+    fontWeight: '500',
+    color: '#DC2626',
     background: 'none',
     border: 'none',
     cursor: 'pointer',
-    width: '100%',
-    transition: 'all 0.2s'
+    transition: 'all 0.2s ease',
+    '&:hover': {
+      backgroundColor: '#FEE2E2'
+    }
+  },
+  logoutIcon: {
+    width: '20px',
+    height: '20px',
+    color: '#DC2626'
+  },
+  divider: {
+    height: '1px',
+    background: 'linear-gradient(to right, rgba(229, 231, 235, 0) 0%, rgba(229, 231, 235, 0.5) 50%, rgba(229, 231, 235, 0) 100%)',
+    margin: '16px 0'
+  },
+  userSection: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+    padding: '16px',
+    borderRadius: '12px',
+    backgroundColor: '#F9FAFB',
+    marginTop: 'auto'
+  },
+  userAvatar: {
+    width: '40px',
+    height: '40px',
+    borderRadius: '10px',
+    backgroundColor: '#E5E7EB'
+  },
+  userInfo: {
+    flex: 1,
+    overflow: 'hidden'
+  },
+  userName: {
+    fontSize: '14px',
+    fontWeight: '600',
+    color: '#111827',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis'
+  },
+  userEmail: {
+    fontSize: '12px',
+    color: '#6B7280',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis'
   },
   mobileContainer: {
     display: 'block'
@@ -213,40 +284,48 @@ export default function DashboardLayout({ children }) {
             <img src={doraImage} alt="Dora AI Logo" style={styles.logo} />
             <span style={styles.logoText}>Dora AI</span>
           </div>
+
+          <div style={styles.divider} />
+
           <nav style={styles.nav}>
             <ul style={styles.navList}>
-              <li>
-                <ul style={{ margin: '-8px' }}>
-                  {navigation.map((item) => (
-                    <li key={item.name}>
-                      <Link
-                        to={item.href}
-                        style={{
-                          ...styles.navItem,
-                          ...(location.pathname === item.href ? styles.navItemActive : {})
-                        }}
-                      >
-                        <item.icon
-                          style={{
-                            ...styles.navIcon,
-                            ...(location.pathname === item.href ? styles.navIconActive : {})
-                          }}
-                          aria-hidden="true"
-                        />
-                        {item.name}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </li>
-              <li style={{ marginTop: 'auto' }}>
-                <button onClick={logout} style={styles.logoutButton}>
-                  <ArrowLeftOnRectangleIcon style={styles.navIcon} aria-hidden="true" />
-                  Logout
-                </button>
-              </li>
+              {navigation.map((item) => (
+                <li key={item.name}>
+                  <Link
+                    to={item.href}
+                    style={{
+                      ...styles.navItem,
+                      ...(location.pathname === item.href ? styles.navItemActive : {})
+                    }}
+                  >
+                    <item.icon
+                      style={{
+                        ...styles.navIcon,
+                        ...(location.pathname === item.href ? styles.navIconActive : {})
+                      }}
+                      aria-hidden="true"
+                    />
+                    {item.name}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </nav>
+
+          {/* <div style={styles.userSection}>
+            <div style={styles.userAvatar}>
+              <UserCircleIcon style={{ width: '100%', height: '100%', color: '#9CA3AF' }} />
+            </div>
+            <div style={styles.userInfo}>
+              <div style={styles.userName}>John Doe</div>
+              <div style={styles.userEmail}>john@example.com</div>
+            </div>
+          </div> */}
+
+          <button onClick={logout} style={styles.logoutButton}>
+            <ArrowLeftOnRectangleIcon style={styles.logoutIcon} aria-hidden="true" />
+            Logout
+          </button>
         </div>
       </div>
 

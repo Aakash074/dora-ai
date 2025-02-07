@@ -155,20 +155,77 @@ const styles = {
   },
   footer: {
     width: '100%',
-    background: 'rgba(255, 255, 255, 0.8)',
-    backdropFilter: 'blur(8px)',
-    padding: '32px 0',
-    marginTop: 'auto'
+    background: 'rgba(255, 255, 255, 0.9)',
+    backdropFilter: 'blur(12px)',
+    padding: '64px 0 32px',
+    marginTop: 'auto',
+    borderTop: '1px solid rgba(124, 58, 237, 0.1)'
   },
   footerInner: {
     maxWidth: '1280px',
     margin: '0 auto',
-    padding: '0 24px'
+    padding: '0 24px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '48px'
   },
   footerGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-    gap: '32px'
+    gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+    gap: '48px'
+  },
+  footerLogo: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '16px'
+  },
+  footerLogoText: {
+    fontSize: '20px',
+    fontWeight: 'bold',
+    background: 'linear-gradient(to right, #7C3AED, #4F46E5)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent'
+  },
+  footerDescription: {
+    color: '#6B7280',
+    lineHeight: '1.6',
+    fontSize: '16px',
+    maxWidth: '300px'
+  },
+  footerColumn: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '20px'
+  },
+  footerColumnTitle: {
+    fontSize: '18px',
+    fontWeight: '600',
+    color: '#111827'
+  },
+  footerList: {
+    listStyle: 'none',
+    padding: 0,
+    margin: 0,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px'
+  },
+  footerLink: {
+    color: '#6B7280',
+    textDecoration: 'none',
+    fontSize: '16px',
+    transition: 'color 0.2s ease',
+    cursor: 'pointer',
+    ':hover': {
+      color: '#4F46E5'
+    }
+  },
+  footerBottom: {
+    borderTop: '1px solid rgba(124, 58, 237, 0.1)',
+    paddingTop: '32px',
+    textAlign: 'center',
+    color: '#6B7280',
+    fontSize: '14px'
   }
 }
 
@@ -275,39 +332,43 @@ function Landing() {
       <footer style={styles.footer}>
         <div style={styles.footerInner}>
           <div style={styles.footerGrid}>
-            <div>
+            <div style={styles.footerLogo}>
               <div style={styles.logo}>
                 <img src={doraImage} alt="Dora AI Logo" style={styles.logoImage} />
-                <span style={styles.logoText}>Dora AI</span>
+                <span style={styles.footerLogoText}>Dora AI</span>
               </div>
-              <p style={styles.featureText}>Your AI-powered travel companion for smarter, rewarding adventures.</p>
+              <p style={styles.footerDescription}>Your AI-powered travel companion for smarter, rewarding adventures.</p>
             </div>
-            <div>
-              <h4 style={styles.featureTitle}>Features</h4>
-              <ul style={styles.featureText}>
-                <li>Travel to Earn</li>
-                <li>Social Media Curation</li>
-                <li>Smart Itineraries</li>
+            
+            <div style={styles.footerColumn}>
+              <h4 style={styles.footerColumnTitle}>Features</h4>
+              <ul style={styles.footerList}>
+                <li><span style={{...styles.footerLink, ':hover': { color: '#4F46E5' }}}>Travel to Earn</span></li>
+                <li><span style={{...styles.footerLink, ':hover': { color: '#4F46E5' }}}>Social Media Curation</span></li>
+                <li><span style={{...styles.footerLink, ':hover': { color: '#4F46E5' }}}>Smart Itineraries</span></li>
               </ul>
             </div>
-            <div>
-              <h4 style={styles.featureTitle}>Company</h4>
-              <ul style={styles.featureText}>
-                <li>About Us</li>
-                <li>Contact</li>
-                <li>Privacy Policy</li>
+
+            <div style={styles.footerColumn}>
+              <h4 style={styles.footerColumnTitle}>Company</h4>
+              <ul style={styles.footerList}>
+                <li><span style={{...styles.footerLink, ':hover': { color: '#4F46E5' }}}>About Us</span></li>
+                <li><span style={{...styles.footerLink, ':hover': { color: '#4F46E5' }}}>Contact</span></li>
+                <li><span style={{...styles.footerLink, ':hover': { color: '#4F46E5' }}}>Privacy Policy</span></li>
               </ul>
             </div>
-            <div>
-              <h4 style={styles.featureTitle}>Connect</h4>
-              <ul style={styles.featureText}>
-                <li>Twitter</li>
-                <li>Discord</li>
-                <li>Instagram</li>
+
+            <div style={styles.footerColumn}>
+              <h4 style={styles.footerColumnTitle}>Connect</h4>
+              <ul style={styles.footerList}>
+                <li><span style={{...styles.footerLink, ':hover': { color: '#4F46E5' }}}>Twitter</span></li>
+                <li><span style={{...styles.footerLink, ':hover': { color: '#4F46E5' }}}>Discord</span></li>
+                <li><span style={{...styles.footerLink, ':hover': { color: '#4F46E5' }}}>Instagram</span></li>
               </ul>
             </div>
           </div>
-          <div style={styles.featureText}>
+
+          <div style={styles.footerBottom}>
             <p>© 2024 Dora AI. All rights reserved.</p>
           </div>
         </div>
