@@ -127,13 +127,16 @@ const styles = {
     left: 0,
     right: 0,
     borderTop: '1px solid rgba(229, 231, 235, 1)',
-    background: 'rgba(255, 255, 255, 0.5)',
+    background: 'rgba(255, 255, 255, 0.9)',
     backdropFilter: 'blur(8px)',
     padding: '0 16px',
     display: 'flex',
     height: '64px',
     alignItems: 'center',
-    justifyContent: 'space-around'
+    justifyContent: 'space-around',
+    zIndex: 1000,
+    WebkitBackfaceVisibility: 'hidden',
+    backfaceVisibility: 'hidden'
   },
   mobileNavItem: {
     display: 'inline-flex',
@@ -167,11 +170,16 @@ const styles = {
     cursor: 'pointer'
   },
   mainContent: {
-    paddingLeft: 0
+    paddingLeft: 0,
+    minHeight: '100vh',
+    paddingBottom: '64px'
   },
   mainInner: {
-    padding: '24px 16px 80px',
-    minHeight: '100vh'
+    padding: '24px 16px',
+    minHeight: '100vh',
+    '@media (max-width: 1023px)': {
+      paddingBottom: '80px'
+    }
   }
 }
 

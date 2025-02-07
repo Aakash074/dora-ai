@@ -1,3 +1,9 @@
+import { useState, useEffect } from 'react'
+import { ethers } from 'ethers'
+import bucketAbi from '../contracts/bucketListContractABI.json'
+
+const BUCKET_CONTRACT_ADDRESS = import.meta.env.VITE_BUCKET_LIST_CONTRACT_ADDRESS
+
 const styles = {
   container: {
     maxWidth: '1200px',
@@ -23,90 +29,186 @@ const styles = {
     fontSize: '18px',
     color: '#6B7280'
   },
-  createButton: {
-    backgroundColor: '#6366F1',
-    color: 'white',
-    padding: '8px 16px',
-    borderRadius: '6px',
-    fontSize: '14px',
-    fontWeight: '500',
-    cursor: 'pointer',
-    transition: 'all 0.2s ease'
-  },
-  grid: {
-    display: 'grid',
-    gridTemplateColumns: '1fr',
-    gap: '24px',
-    marginTop: '32px'
-  },
   card: {
     backgroundColor: 'rgba(255, 255, 255, 0.5)',
-    borderRadius: '8px',
+    borderRadius: '12px',
     border: '1px solid #E5E7EB',
     padding: '24px',
-    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+    margin: '16px 0',
+    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
     transition: 'all 0.2s ease'
   },
-  cardImage: {
-    width: '100%',
-    height: '200px',
-    borderRadius: '6px',
-    overflow: 'hidden',
-    backgroundColor: '#F3F4F6'
+  cardHover: {
+    transform: 'translateY(-2px)',
+    boxShadow: '0 8px 12px rgba(0, 0, 0, 0.1)'
   },
-  image: {
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover'
+  countryTitle: {
+    fontSize: '24px',
+    fontWeight: '600',
+    color: '#111827',
+    marginBottom: '16px'
   },
-  cardTitle: {
+  locationItem: {
+    padding: '12px 0',
+    borderBottom: '1px solid #E5E7EB'
+  },
+  locationName: {
     fontSize: '18px',
     fontWeight: '500',
-    color: '#111827',
-    marginTop: '16px'
+    color: '#374151',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px'
   },
-  cardDescription: {
+  locationType: {
+    color: '#6366F1',
+    fontSize: '14px',
+    padding: '2px 8px',
+    backgroundColor: '#EEF2FF',
+    borderRadius: '4px'
+  },
+  locationAddress: {
     fontSize: '14px',
     color: '#6B7280',
     marginTop: '4px'
   },
-  cardStats: {
-    fontSize: '14px',
-    color: '#6B7280',
+  price: {
+    fontSize: '20px',
+    fontWeight: '600',
+    color: '#059669',
     marginTop: '16px'
+  },
+  bookButton: {
+    textAlign: 'right',
+    color: '#6366F1',
+    fontWeight: '500',
+    cursor: 'pointer',
+    marginTop: '12px',
+    transition: 'color 0.2s ease'
   }
 }
 
+function transformToCountryGroupedArray(nftLinks) {
+  const countryMap = {}
+
+  nftLinks.forEach((nftLink) => {
+    const tokenId = nftLink.tokenId.toString()
+
+    nftLink.selectedBuckets.forEach((bucket) => {
+      const addressParts = bucket.place.split(", ")
+      const country = addressParts[addressParts.length - 1]
+
+      if (!countryMap[country]) {
+        countryMap[country] = []
+      }
+
+      countryMap[country].push({
+        nftId: tokenId,
+        type: bucket.bucketType,
+        name: bucket.name,
+        address: bucket.place,
+        isCompleted: bucket.isCompleted
+      })
+    })
+  })
+
+  return Object.entries(countryMap).map(([country, locations]) => ({
+    country,
+    locations: locations.sort((a, b) => a.name.localeCompare(b.name))
+  }))
+}
+
 export default function Buckets() {
+  const [countries, setCountries] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  const getBucketList = async () => {
+    try {
+      const provider = new ethers.providers.Web3Provider(window.ethereum)
+      const signer = provider.getSigner()
+      const userAddress = await signer.getAddress()
+      const contract = new ethers.Contract(BUCKET_CONTRACT_ADDRESS, bucketAbi, signer)
+
+      const bucketListData = await contract.getUserBucketList(userAddress)
+      const finalResult = transformToCountryGroupedArray(bucketListData)
+      setCountries(finalResult)
+    } catch (error) {
+      console.error('Error fetching bucket list:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    getBucketList()
+  }, [])
+
+  const handleBookNow = (country, locations) => {
+    console.log('Booking for:', { country, locations })
+    // Add your booking logic here
+  }
+
   return (
     <div style={styles.container}>
       <div style={styles.header}>
         <div style={styles.headerContent}>
-          <h1 style={styles.title}>Travel Buckets</h1>
+          <h1 style={styles.title}>Your Travel Buckets</h1>
           <p style={styles.subtitle}>
-            Organize and manage your travel inspirations in personalized buckets.
+            Explore your saved destinations grouped by country
           </p>
         </div>
-        <button style={styles.createButton}>
-          Create Bucket
-        </button>
       </div>
-      
-      <div style={styles.grid}>
-        {/* Example bucket card */}
-        <div style={styles.card}>
-          <div style={styles.cardImage}>
-            <img
-              src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e"
-              alt="Beach destinations"
-              style={styles.image}
-            />
+
+      {loading ? (
+        <div>Loading your bucket list...</div>
+      ) : countries.length > 0 ? (
+        countries.map((item, countryIndex) => (
+          <div
+            key={countryIndex}
+            style={styles.card}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)'
+              e.currentTarget.style.boxShadow = '0 8px 12px rgba(0, 0, 0, 0.1)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'none'
+              e.currentTarget.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.05)'
+            }}
+          >
+            <h2 style={styles.countryTitle}>{item.country}</h2>
+            {item.locations.map((location, locationIndex) => (
+              <div key={locationIndex} style={styles.locationItem}>
+                <div style={styles.locationName}>
+                  {locationIndex + 1}. {location.name}
+                  <span style={styles.locationType}>
+                    {location.type}
+                  </span>
+                </div>
+                <div style={styles.locationAddress}>
+                  {location.address}
+                </div>
+              </div>
+            ))}
+            <div style={styles.price}>
+              {parseInt(Math.random() * 1000)} USD
+            </div>
+            <div
+              style={styles.bookButton}
+              onClick={() => handleBookNow(item.country, item.locations)}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = '#4F46E5'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = '#6366F1'
+              }}
+            >
+              Book Now
+            </div>
           </div>
-          <h3 style={styles.cardTitle}>Beach Destinations</h3>
-          <p style={styles.cardDescription}>Collection of beautiful beaches around the world</p>
-          <p style={styles.cardStats}>12 places saved</p>
-        </div>
-      </div>
+        ))
+      ) : (
+        <div>No bucket list items found. Start by adding some destinations!</div>
+      )}
     </div>
   )
 } 
