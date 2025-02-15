@@ -369,6 +369,7 @@ export default function Upload() {
         const videoDetails = response.data.items[0].snippet
         setProcessingStatus('Processing video content...')
         let result = await axios.get("https://api.clonemytrips.com/reels/ytShorts?url=" + videoId)
+        result = await axios.get("https://api.clonemytrips.com/reels/id/" + result.data.id)
         result = result.data
         setExtractedData({ result, videoDetails })
         setProcessingStatus('Video processed successfully!')
